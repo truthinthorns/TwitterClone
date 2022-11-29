@@ -1,8 +1,0 @@
-<% layout('layouts/boilerplate') %>
-  <h1>Choose a Semester</h1>
-  <nav>
-    <% for(let term of termSet) { %>
-      <a href="/viewgrades/<%= term %>"><%= term %></a>
-      <hr>
-    <% } %>
-</nav>
