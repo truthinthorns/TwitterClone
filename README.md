@@ -3,7 +3,7 @@
 <ul>
 <li>This is a project intended as practice to clone my university's student portal. This project uses EJS, Passport, Mongoose, Express, Bootstrap, etc.</li>
 <li>I am using what I learned from this [https://www.udemy.com/course/the-web-developer-bootcamp/] Udemy course to practice making websites.</li>
-  <li>The styling is ugly <i>at best</i>. I struggle with styling the most.</li>
+  <li>The styling will probably be ugly <i>at best</i>. I struggle with styling the most.</li>
 </ul>
 
 
