@@ -1,51 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Student Portal</title>
-    <link rel="stylesheet" href="/app.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-</head>
-
-<body style="background-color: #00916E;">
-    <main>
-        <div class="row m-5">
-            <div class="col-4 mx-auto">
-                <%- include('./partials/flash') %>
-                <div class="card">
-                    <div class="card-body mx-auto">
-                        <h2 class="card-title">Login</h2>
-                    </div>
-                    <div class="card-body mx-auto">
-                        <form action="/login" method="post" class="validate-form" novalidate>
-                            <div class="mb-2">
-                                <label for="s_fullnameInput" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="s_usernameInput" name="username"
-                                    required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="s_passwordInput" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="s_passwordInput" name="password"
-                                    required>
-                            </div>
-                            <div class="mb-2">
-                                <button type="submit" class="btn btn-primary">Sign Up</button>
-                            </div>
-                        </form>
-                        <hr>
-                        <div class="container d-inline-flex mx-0">
-                            <p class="me-2">Need an Account?</p>
-                            <a class="link-dark" href="/signup">Signup</a>
+<% layout('layouts/boilerplate') %>
+<div class="row m-5">
+    <div class="col-4 mx-auto">
+        <%- include('./partials/flash') %>
+            <div class="card">
+                <div class="card-body mx-auto">
+                    <h2 class="card-title text-dark">Login</h2>
+                </div>
+                <div class="card-body mx-auto">
+                    <form action="/login" method="post" class="validate-form" novalidate>
+                        <div class="mb-2">
+                            <label for="s_fullnameInput" class="form-label text-dark">Username</label>
+                            <input type="text" class="form-control" id="s_usernameInput" name="username" required>
                         </div>
+                        <div class="mb-4">
+                            <label for="s_passwordInput" class="form-label text-dark">Password</label>
+                            <input type="password" class="form-control" id="s_passwordInput" name="password"
+                                required>
+                        </div>
+                        <div class="mb-2">
+                            <button type="submit" class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="container d-inline-flex mx-0">
+                        <p class="me-2 text-dark">Need an Account?</p>
+                        <a class="link-dark" href="/signup">Signup</a>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-</body>
-
-</html>
+    </div>
+</div>

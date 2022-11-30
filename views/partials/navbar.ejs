@@ -1,0 +1,35 @@
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Kiwi Beans</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-link" href="/">Home</a>
+        </div>
+  
+        <div class="navbar-nav ms-auto">
+          <% if (!currentUser) { %>
+            <a class="nav-link" href="/login">Login</a>
+            <a class="nav-link" href="/signup">Sign Up</a>
+            <% } else {%>
+                    <div class="nav-item dropdown ms-auto dropstart">
+                        <a class="nav-link dropdown-toggle" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Username Here
+                        </a>
+                        <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="/profile">View Profile</a></li>
+                          <li><a class="dropdown-item" href="#">Another action</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                      </li>
+                      </div>
+            <!-- <a class="nav-link" href="/logout">Logout</a> -->
+              <% } %>
+        </div>
+      </div>
+    </div>
+  </nav>

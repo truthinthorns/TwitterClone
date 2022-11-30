@@ -56,33 +56,57 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-    res.render('home.ejs');
+    res.render('home.ejs',{title: 'Home'});
 })
 
-// app.get('/signup', (req, res) => {
-//     res.render('signup.ejs');
-// })
+app.get('/signup', (req, res) => {
+    res.render('signup.ejs',{title: 'Sign Up'});
+})
 
-// app.post('/signup', async (req, res) => {
-//     try {
-//         console.log(req.body.name);
-//         const {fullname, username, email, password, dob, ssn } = req.body;
-//         const student = new Student({ name: fullname ,email, username, dob, ssn });
-//         const registeredStudent = await Student.register(student, password);
-//         console.log(registeredStudent);
-//         req.login(registeredStudent, err => {
-//             if (err) return next(err);
-//             req.flash('success', 'Welcome to YelpCamp!');
-//             res.redirect('/coursehistory');
-//         })
-//     } catch (e) {
-//         console.log(e)
-//         req.flash('error', e.message);
-//         res.redirect('/signup');
-//     }
-// })
+app.post('/signup', async (req, res) => {
+    try {
+        const {name, username, email, password, dob } = req.body;
+        const user = new User({ name, email, username, dob });
+        const registeredUser = await User.register(user, password);
+        console.log(registeredUser);
+        req.login(registeredUser, err => {
+            if (err) return next(err);
+            req.flash('success', 'Welcome to Kiwi Beans!');
+            res.redirect('/test');
+        })
+    } catch (e) {
+        console.log(e);
+        req.flash('error', e.message);
+        res.redirect('/signup');
+    }
+})
 
-// app.get('/login', (req, res) => {
+app.get('/login', (req, res) => {
+    res.render('login.ejs',{title: 'Login'});
+})
+
+//this looks for a username and password by default.
+app.post('/login',passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }),(req, res) => {
+    req.flash('success', 'Welcome Back!');
+    const redirectUrl = req.session.returnTo || '/';
+    delete req.session.returnTo;
+    res.redirect(redirectUrl);
+})
+
+app.get('/logout',(req, res) => {
+    req.logout((err) => {
+        if (err) { return next(err) }
+    })
+    req.flash('success', 'Goodbye!');
+    res.redirect('/login');
+})
+
+app.get('/test',(req,res)=>{
+    res.render('test',{title: 'Test'});
+})
+
+// // app.get('/coursehistory', async(req, res) => {
+// //     const student = await Student.fapp.get('/login', (req, res) => {
 //     res.render('login.ejs');
 // })
 
@@ -92,10 +116,7 @@ app.get('/', (req, res) => {
 //     const redirectUrl = req.session.returnTo || '/coursehistory';
 //     delete req.session.returnTo;
 //     res.redirect(redirectUrl);
-// })
-
-// app.get('/coursehistory', async(req, res) => {
-//     const student = await Student.findById(req.user._id).populate('courseHistory');
+// })indById(req.user._id).populate('courseHistory');
 //     res.render('academics/mycoursehistory.ejs', { student });
 // })
 
