@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+const Tweet = require('./models/tweet');
 
 mongoose.connect('mongodb://localhost:27017/portfolio', { useNewUrlParser: true, useUnifiedTopology: true })
 const db = mongoose.connection;
@@ -55,8 +56,9 @@ app.use((req, res, next) => {
     next();
 })
 
-app.get('/', (req, res) => {
-    res.render('home.ejs',{title: 'Home'});
+app.get('/', async (req, res) => {
+    const tweets = await Tweet.find({}).populate('author');
+    res.render('home.ejs',{title: 'Home',tweets});
 })
 
 app.get('/signup', (req, res) => {
@@ -101,8 +103,12 @@ app.get('/logout',(req, res) => {
     res.redirect('/login');
 })
 
-app.get('/test',(req,res)=>{
-    res.render('test',{title: 'Test'});
+app.post('/posttweet',async (req,res)=>{
+    const {content} = req.body;
+    const tweet = new Tweet({author: req.user._id, content,timestamp: new Date(),likes: 0});
+    await tweet.save();
+    req.flash('success','Successfully Composed Tweet');
+    res.redirect('/');
 })
 
 // // app.get('/coursehistory', async(req, res) => {
