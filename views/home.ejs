@@ -15,24 +15,21 @@
 
     <h1>Tweets</h1>
     <% for (let tweet of tweets) {%>
-        <div class="card mb-3">
+        <div class="card mb-3 w-50 offset-3">
             <div class="row">
                 <div class="col">
                     <div class="card-body">
-                        <h5 class="card-title text-dark">
+                        <h4 class="card-title text-dark">
                             <%= tweet.author.username %>
-                        </h5>
+                        </h4>
                         <p class="card-text text-dark">
                             <%= tweet.content %>
                         </p>
-                        <p class="card-text">
-                                <svg
-                                class="bi" width="1em" height="1em">
+                        <p class="card-text"><svg
+                                class="bi" width="1em" height="1em" style="fill: red;">
                                 <use xlink:href="#heart-empty" />
                                 </svg>
                         </p>
-                        <!-- <a class='btn btn-primary' href="/campgrounds/<%= ///campground._id %>">View <%= //campground.title%> -->
-                        </a>
                     </div>
                 </div>
             </div>

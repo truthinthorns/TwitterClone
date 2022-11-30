@@ -49,6 +49,16 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+//credits: https://bobbyhadz.com/blog/javascript-convert-month-number-to-name
+function getMonthName(month) {
+    const date = new Date();
+    date.setMonth(month);
+  
+    return date.toLocaleString('en-US', {
+      month: 'long',
+    });
+  }
+
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
@@ -68,16 +78,14 @@ app.get('/signup', (req, res) => {
 app.post('/signup', async (req, res) => {
     try {
         const {name, username, email, password, dob } = req.body;
-        const user = new User({ name, email, username, dob });
+        const user = new User({ name, email, username, dob, joinDate: new Date()});
         const registeredUser = await User.register(user, password);
-        console.log(registeredUser);
         req.login(registeredUser, err => {
             if (err) return next(err);
             req.flash('success', 'Welcome to Kiwi Beans!');
-            res.redirect('/test');
+            res.redirect('/');
         })
     } catch (e) {
-        console.log(e);
         req.flash('error', e.message);
         res.redirect('/signup');
     }
@@ -109,6 +117,13 @@ app.post('/posttweet',async (req,res)=>{
     await tweet.save();
     req.flash('success','Successfully Composed Tweet');
     res.redirect('/');
+})
+
+app.get('/profile',async(req,res)=>{
+    const user = await User.findById(req.user._id);
+    const joinMonth = getMonthName(user.joinDate.getMonth());
+    const birthMonth = getMonthName(user.dob.getMonth());
+    res.render('profile',{title: 'Profile',user,joinMonth,birthMonth});
 })
 
 // // app.get('/coursehistory', async(req, res) => {

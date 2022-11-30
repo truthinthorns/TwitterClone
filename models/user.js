@@ -15,6 +15,13 @@ const UserSchema = new Schema({
     dob: {
         type: Date,
         required: true
+    },
+    bio: {
+        type: String
+    },
+    joinDate: {
+        type: Date,
+        required: true
     }
 })
 
