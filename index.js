@@ -121,9 +121,10 @@ app.post('/posttweet',async (req,res)=>{
 
 app.get('/profile',async(req,res)=>{
     const user = await User.findById(req.user._id);
+    const tweets = await Tweet.find({"author" : user._id}).populate('author');
     const joinMonth = getMonthName(user.joinDate.getMonth());
     const birthMonth = getMonthName(user.dob.getMonth());
-    res.render('profile',{title: 'Profile',user,joinMonth,birthMonth});
+    res.render('profile',{title: 'Profile',user,joinMonth,birthMonth,tweets});
 })
 
 // // app.get('/coursehistory', async(req, res) => {
