@@ -10,6 +10,9 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 const Tweet = require('./models/tweet');
+const Following = require('./models/following');
+const Followers = require('./models/followers');
+const moment = require('moment');
 
 mongoose.connect('mongodb://localhost:27017/portfolio', { useNewUrlParser: true, useUnifiedTopology: true })
 const db = mongoose.connection;
@@ -77,8 +80,8 @@ app.get('/signup', (req, res) => {
 
 app.post('/signup', async (req, res) => {
     try {
-        const {name, username, email, password, dob } = req.body;
-        const user = new User({ name, email, username, dob, joinDate: new Date()});
+        const info = {...req.body};
+        const user = new User({ info, joinDate: new Date()});
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);
@@ -119,61 +122,34 @@ app.post('/posttweet',async (req,res)=>{
     res.redirect('/');
 })
 
-app.get('/profile',async(req,res)=>{
-    const user = await User.findById(req.user._id);
-    const tweets = await Tweet.find({"author" : user._id}).populate('author');
+app.get('/profile/:id',async(req,res)=>{
+    const {id} = req.params;
+    const user = await User.findById(id).populate('followers').populate('following');
     const joinMonth = getMonthName(user.joinDate.getMonth());
     const birthMonth = getMonthName(user.dob.getMonth());
+    const tweets = await Tweet.find({"author" : user._id}).populate('author');
     res.render('profile',{title: 'Profile',user,joinMonth,birthMonth,tweets});
 })
 
-// // app.get('/coursehistory', async(req, res) => {
-// //     const student = await Student.fapp.get('/login', (req, res) => {
-//     res.render('login.ejs');
-// })
+app.put('/profile/:id',async(req,res)=>{
+    const {id} = req.params;
+    const user = await User.findById(id);
+    if(!user){
+        req.flash('error',"Can't find that profile!");
+        return res.redirect('/');
+    }
+    const newInfo = {...req.body.profile};
+    const profile = await User.findByIdAndUpdate(id,newInfo);
+    req.flash('success','Successfully updated profile!');
+    res.redirect(`/profile/${user._id}`);
+})
 
-// //this looks for a username and password by default.
-// app.post('/login',passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }),(req, res) => {
-//     req.flash('success', 'Welcome Back!');
-//     const redirectUrl = req.session.returnTo || '/coursehistory';
-//     delete req.session.returnTo;
-//     res.redirect(redirectUrl);
-// })indById(req.user._id).populate('courseHistory');
-//     res.render('academics/mycoursehistory.ejs', { student });
-// })
-
-// app.get('/viewgrades', async(req, res) => {
-//     const student = await Student.findById(req.user._id).populate('courseHistory');
-//     const termSet = new Set();
-//     for(let c of student.courseHistory){
-//         termSet.add(c.term);
-//     }
-//     res.render('academics/viewmygrades.ejs',{termSet});
-// })
-// app.get('/viewgrades/:term', async(req, res) => {
-//     const {term} = req.params;
-//     const student = await Student.findById(req.user._id).populate('courseHistory');
-//     const courses = [];
-//     for(let course of student.courseHistory){
-//         if(course.term==term)
-//             courses.push(course);
-//     }
-//     res.render('academics/viewsemestergrades.ejs',{courses,term});
-// })
-
-// app.get('/courseinfo/:courseID/:courseTerm',async(req,res)=>{
-//     let {courseID,courseTerm} = req.params;
-//     courseTerm = courseTerm.replace(' ','');
-//     const student = await Student.findById(req.user._id).populate('courseHistory');
-//     for(let course of student.courseHistory){
-//         if(course.term===courseTerm && course.number===courseID){
-//             console.log(course);
-//             return res.render('/meetingInfo',{course});
-//         }
-//     }
-//     console.log()
-//     res.render()
-// })
+app.get('/profile/:id/edit',async(req,res)=>{
+    const {id} = req.params;
+    const user = await User.findById(id);
+    const dob = moment(user.dob).utc().format("YYYY-MM-DD");
+    res.render('editprofile',{user,dob,title:'Edit Profile'});
+})
 
 app.listen(3000, () => {
     console.log('Server open on port 3000');

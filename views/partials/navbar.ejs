@@ -1,6 +1,9 @@
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Kiwi Beans</a>
+      <a class="navbar-brand" href="/">
+        <!-- <img src="https://i.pinimg.com/originals/93/f6/cf/93f6cfa29cf8ce9f19c7c877be5fa503.jpg" alt="Logo" width="30" height="24" class="d-inline-block align-text-top"> -->
+        Kiwi Beans
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -14,10 +17,10 @@
             <% } else {%>
                     <div class="nav-item dropdown ms-auto dropstart">
                         <a class="nav-link dropdown-toggle" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          Username Here
+                          <%= currentUser.username %>
                         </a>
                         <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="/profile">View Profile</a></li>
+                          <li><a class="dropdown-item" href="/profile/<%= currentUser._id %>">View Profile</a></li>
                           <li><a class="dropdown-item" href="#">Another action</a></li>
                           <li><hr class="dropdown-divider"></li>
                           <li><a class="dropdown-item" href="/logout">Logout</a></li>

@@ -15,14 +15,14 @@
 
     <h1>Tweets</h1>
     <% for (let tweet of tweets) {%>
-        <div class="card mb-3 w-50 offset-3">
+        <div class="card mb-3 w-50 offset-3 bg-dark">
             <div class="row">
                 <div class="col">
                     <div class="card-body">
-                        <h4 class="card-title text-dark">
-                            @<%= tweet.author.username %>
+                        <h4 class="card-title text-light">
+                            @<a href="/profile/<%= tweet.author._id %>"><%= tweet.author.username %></a>
                         </h4>
-                        <p class="card-text text-dark">
+                        <p class="card-text text-light">
                             <%= tweet.content %>
                         </p>
                         <p class="card-text"><svg
@@ -39,7 +39,7 @@
         
         <!-- Button trigger modal -->
         <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><svg
-                        class="bi" width="1em" height="1em">
+                        class="bi" width="1em" height="1em" style="fill: white;">
                         <use xlink:href="#pen" />
                 </svg></button>
 

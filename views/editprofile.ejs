@@ -1,0 +1,47 @@
+<% layout('layouts/boilerplate') %>
+<div class="row m-5">
+    <div class="col-4 mx-auto">
+        <div class="card">
+            <div class="card-body mx-auto">
+                <h2 class="card-title text-dark">Edit Profile</h2>
+            </div>
+            <div class="card-body mx-auto">
+                <form action="/profile/<%=user._id%>?_method=PUT" method="post" class="validate-form" novalidate>
+                    <div class="mb-2">
+                        <label for="s_nameInput" class="form-label text-dark">Full Name</label>
+                        <input type="text" class="form-control" id="s_nameInput" name="profile[name]" value="<%= user.name%>"
+                            required>
+                    </div>
+                    <div class="mb-2">
+                        <label for="s_usernameInput" class="form-label text-dark">Username</label>
+                        <input type="text" class="form-control" id="s_usernameInput" name="profile[username]" value="<%= user.username%>"
+                            required>
+                    </div>
+                    <div class="mb-2">
+                        <label for="s_bioInput" class="form-label text-dark">Bio</label>
+                        <input type="text" class="form-control" id="s_bioInput" name="profile[bio]" value="<%= user.bio%>"
+                            required>
+                    </div>
+                    <div class="mb-2">
+                        <label for="s_dobInput" class="form-label text-dark">Date of Birth</label>
+                        <input type="date" class="form-control" id="s_dobInput" name="profile[dob]" value="<%=dob%>" required>
+                    </div>
+                    <div class="mb-2">
+                        <label for="s_emailInput" class="form-label text-dark">Email address</label>
+                        <input type="email" class="form-control" id="s_emailInput"
+                            aria-describedby="s_emailHelp" name="profile[email]" value="<%= user.email%>" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="s_passwordInput" class="form-label text-dark">Password</label>
+                        <input type="password" class="form-control" id="s_passwordInput"
+                            aria-describedby="s_passwordHelp" name="profile[password]" value="<%= user.password%>" required>
+                        <div id="s_passwordHelp" class="form-text">Password Format</div>
+                    </div>
+                    <div class="mb-2">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

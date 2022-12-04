@@ -1,29 +1,29 @@
 <% layout('layouts/boilerplate') %>
 <div class="row m-5">
     <div class="col-4 mx-auto">
-            <div class="card">
+            <div class="card bg-dark">
                 <div class="card-body mx-auto">
-                    <h2 class="card-title text-dark">Login</h2>
+                    <h2 class="card-title text-light">Login</h2>
                 </div>
                 <div class="card-body mx-auto">
                     <form action="/login" method="post" class="validate-form" novalidate>
                         <div class="mb-2">
-                            <label for="s_fullnameInput" class="form-label text-dark">Username</label>
+                            <label for="s_fullnameInput" class="form-label text-light">Username</label>
                             <input type="text" class="form-control" id="s_usernameInput" name="username" required>
                         </div>
                         <div class="mb-4">
-                            <label for="s_passwordInput" class="form-label text-dark">Password</label>
+                            <label for="s_passwordInput" class="form-label text-light">Password</label>
                             <input type="password" class="form-control" id="s_passwordInput" name="password"
                                 required>
                         </div>
                         <div class="mb-2">
-                            <button type="submit" class="btn btn-primary">Sign Up</button>
+                            <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
                     <hr>
                     <div class="container d-inline-flex mx-0">
-                        <p class="me-2 text-dark">Need an Account?</p>
-                        <a class="link-dark" href="/signup">Signup</a>
+                        <p class="me-2 text-light">Need an Account?</p>
+                        <a class="link-light" href="/signup">Sign Up</a>
                     </div>
                 </div>
             </div>
