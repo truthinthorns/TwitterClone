@@ -13,6 +13,9 @@ const Tweet = require('./models/tweet');
 const Following = require('./models/following');
 const Followers = require('./models/followers');
 const moment = require('moment');
+//const { profile } = require('console');
+const catchAsync = require('./utils/CatchAsync');
+const { isLoggedIn, isTweetAuthor,isOwnProfile } = require('./middleware');
 
 mongoose.connect('mongodb://localhost:27017/portfolio', { useNewUrlParser: true, useUnifiedTopology: true })
 const db = mongoose.connection;
@@ -69,19 +72,23 @@ app.use((req, res, next) => {
     next();
 })
 
-app.get('/', async (req, res) => {
+// first makes sure you're logged in
+// then gets ALL tweets (temporary), and renders the homepage.
+app.get('/', isLoggedIn, catchAsync(async (req, res) => {
     const tweets = await Tweet.find({}).populate('author');
     res.render('home.ejs',{title: 'Home',tweets});
-})
+}))
 
+// renders the sign up page.
 app.get('/signup', (req, res) => {
     res.render('signup.ejs',{title: 'Sign Up'});
 })
 
-app.post('/signup', async (req, res) => {
+// gets the info from the sign up page, then creates a new user with that info, logs them in, and redirects to the homepage.
+app.post('/signup', catchAsync(async (req, res) => {
     try {
-        const info = {...req.body};
-        const user = new User({ info, joinDate: new Date()});
+        const {username,name,dob,email,password}=req.body;
+        const user = new User({username,name,dob,email,joinDate: new Date()});
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);
@@ -89,16 +96,20 @@ app.post('/signup', async (req, res) => {
             res.redirect('/');
         })
     } catch (e) {
+        console.log(e);
         req.flash('error', e.message);
         res.redirect('/signup');
     }
-})
+}))
 
+// renders the login page.
 app.get('/login', (req, res) => {
     res.render('login.ejs',{title: 'Login'});
 })
 
-//this looks for a username and password by default.
+// this looks for a username and password by default.
+// redirects to either the home page or the page requested before being logged in.
+// ALERT: I don't think the redirect works correctly. Always goes to homepage.
 app.post('/login',passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }),(req, res) => {
     req.flash('success', 'Welcome Back!');
     const redirectUrl = req.session.returnTo || '/';
@@ -106,7 +117,9 @@ app.post('/login',passport.authenticate('local', { failureFlash: true, failureRe
     res.redirect(redirectUrl);
 })
 
-app.get('/logout',(req, res) => {
+// first makes sure you're logged in
+// then logs you out and redirects to the login page since you must be logged in to use this app.
+app.get('/logout',isLoggedIn,(req, res) => {
     req.logout((err) => {
         if (err) { return next(err) }
     })
@@ -114,24 +127,32 @@ app.get('/logout',(req, res) => {
     res.redirect('/login');
 })
 
-app.post('/posttweet',async (req,res)=>{
+// first makes sure you're logged in
+// gets the tweet content and creates a new Tweet with that info, then redirects to the homepage.
+app.post('/posttweet', isLoggedIn, catchAsync(async (req,res)=>{
     const {content} = req.body;
-    const tweet = new Tweet({author: req.user._id, content,timestamp: new Date(),likes: 0});
+    const formattedTimestamp = moment(new Date()).utc().format("ddd, MMM Do YYYY, h:mm A");
+    const tweet = new Tweet({author: req.user._id, content,timestamp: new Date(),formattedTimestamp,likes: 0});
     await tweet.save();
     req.flash('success','Successfully Composed Tweet');
     res.redirect('/');
-})
+}))
 
-app.get('/profile/:id',async(req,res)=>{
+// first makes sure you're logged in
+// then looks for a user, and gets the join and birth month, and gets the user's tweets, then renders that user's profile page.
+app.get('/profile/:id', isLoggedIn, catchAsync(async(req,res)=>{
     const {id} = req.params;
     const user = await User.findById(id).populate('followers').populate('following');
-    const joinMonth = getMonthName(user.joinDate.getMonth());
-    const birthMonth = getMonthName(user.dob.getMonth());
+    const joinDate = moment(user.joinDate).utc().format('MMMM YYYY')
+    const birthDate = moment(user.dob).utc().format('MMMM Do, YYYY')
     const tweets = await Tweet.find({"author" : user._id}).populate('author');
-    res.render('profile',{title: 'Profile',user,joinMonth,birthMonth,tweets});
-})
+    res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets});
+}))
 
-app.put('/profile/:id',async(req,res)=>{
+// first makes sure you're logged in
+// then finds a user with the requested id. if found, updates it with the entered info and redirects to the profile page. if not, redirects to the home page.
+// user gets logged out if they change their username, so that needs to be solved. They can change everything else without having to log back in, though.
+app.put('/profile/:id',isLoggedIn, catchAsync(async(req,res)=>{
     const {id} = req.params;
     const user = await User.findById(id);
     if(!user){
@@ -142,15 +163,33 @@ app.put('/profile/:id',async(req,res)=>{
     const profile = await User.findByIdAndUpdate(id,newInfo);
     req.flash('success','Successfully updated profile!');
     res.redirect(`/profile/${user._id}`);
-})
+}))
 
-app.get('/profile/:id/edit',async(req,res)=>{
+// first makes sure you're logged in and it's your profile.
+// then finds a user, and renders an edit form with the fields filled out with the user's saved info.
+app.get('/profile/:id/edit', isLoggedIn,isOwnProfile, catchAsync(async(req,res)=>{
     const {id} = req.params;
     const user = await User.findById(id);
     const dob = moment(user.dob).utc().format("YYYY-MM-DD");
     res.render('editprofile',{user,dob,title:'Edit Profile'});
-})
+}))
 
+// first makes sure you're logged in and you're the tweet author
+// then looks for a tweet to make sure it's valid. if so, deletes it and reloads the profile page. if not, reloads the profile page without deleting anything.
+app.delete('/deletetweet/:id/:tweetID',isLoggedIn,isTweetAuthor, catchAsync(async(req,res)=>{
+    const {id,tweetID} = req.params;
+    //const user = await User.findById(id);
+    const tweet = await Tweet.findById(tweetID);
+    if(!tweet){
+        req.flash('error',"Can't find that tweet!");
+        return res.redirect(`/profile/${id}`);
+    }
+    await Tweet.findByIdAndDelete(tweetID);
+    req.flash('success','Deleted Tweet!');
+    res.redirect(`/profile/${id}`);
+}))
+
+//to access the app, must open localhost:3000
 app.listen(3000, () => {
-    console.log('Server open on port 3000');
+    console.log('Server Open on Port 3000');
 })

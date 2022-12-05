@@ -22,14 +22,15 @@
                         <h4 class="card-title text-light">
                             @<a href="/profile/<%= tweet.author._id %>"><%= tweet.author.username %></a>
                         </h4>
+                        <p class="card-text text-muted"><%= tweet.formattedTimestamp %> UTC</p>
                         <p class="card-text text-light">
                             <%= tweet.content %>
                         </p>
-                        <p class="card-text"><svg
-                                class="bi" width="1em" height="1em" style="fill: red;">
-                                <use xlink:href="#heart-empty" />
-                                </svg>
-                        </p>
+                        <button class="btn btn-primary"><svg class="bi" width="1em" height="1em"
+                                style="fill: white;">
+                                <use xlink:href="#heart-filled" />
+                        </svg>
+                    </button>
                     </div>
                 </div>
             </div>
@@ -60,7 +61,6 @@
                                                         rows="5"></textarea>
                                         </div>
                                         <div class="modal-footer">
-
                                                 <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Close</button>
                                                 <button type="submit" class="btn btn-primary">Post</button>

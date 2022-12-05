@@ -14,6 +14,10 @@ const TweetSchema = new Schema({
         type: Date,
         required: true
     },
+    formattedTimestamp: {
+        type: String,
+        required: true
+    },
     likes: {
         type: Number,
         required: true

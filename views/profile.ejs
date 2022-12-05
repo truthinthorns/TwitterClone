@@ -27,9 +27,10 @@
         </symbol>
     </svg>
 
-    <h1>Profile</h1>
-
     <div class="card mb-2 bg-dark">
+        <div class="card-header mx-auto">
+            <h2>Profile</h2>
+        </div>
         <div class="card-body">
             <h5 class="card-title text-light"><strong>
                     <%= user.name %>
@@ -42,20 +43,20 @@
             <p class="card-text text-muted">
                 <svg class="bi" width="1em" height="1em" style="fill: gray;">
                     <use xlink:href="#balloon" />
-                </svg> Born <%= birthMonth %>
-                    <%= user.dob.getDate()+1 %>, <%= user.dob.getFullYear() %><br>
-                            <svg class="bi" width="1em" height="1em" style="fill: gray;">
-                                <use xlink:href="#calendar" />
-                            </svg> Joined <%= joinMonth %>
-                                <%= user.joinDate.getFullYear() %>
+                </svg> Born <%= birthDate %><br>
+                    <svg class="bi" width="1em" height="1em" style="fill: gray;">
+                        <use xlink:href="#calendar" />
+                    </svg> Joined <%= joinDate %>
             </p>
-            <p class="card-text text-light">Followers X</p>
-            <p class="card-text text-light">Following Y</p>
+            <p class="card-text text-light">Followers </p>
+            <p class="card-text text-light">Following </p>
         </div>
         <div class="card-footer">
-
-            <a href="/profile/<%= user._id %>/edit" class="card-link">Edit Profile</a>
-            <button class="card-link btn btn-primary">Follow</button>
+            <% if (currentUser && user._id.equals(currentUser._id)) { %>
+                <a href="/profile/<%= user._id %>/edit" class="card-link">Edit Profile</a>
+                <% } else { %>
+                    <button class="card-link btn btn-primary">Follow</button>
+                    <% } %>
         </div>
     </div>
     <% for (let tweet of tweets) {%>
@@ -66,21 +67,33 @@
                         <h4 class="card-title text-light">
                             @<%= tweet.author.username %>
                         </h4>
+                        <p class="card-text text-muted">
+                            <%= tweet.formattedTimestamp %> UTC
+                        </p>
                         <p class="card-text text-light">
                             <%= tweet.content %>
                         </p>
-                        <div class="card-footer">
-                            <button class="btn btn-primary"><svg class="bi" width="1em" height="1em"
+                        <hr>
+                        <button id="<%= tweet._id %>" class="btn btn-primary" onClick="likeTweet(this)"><svg class="bi" width="1em"
+                                height="1em" style="fill: white;">
+                                <use xlink:href="#heart-filled" />
+                            </svg>
+                        </button>
+                        <form action="/deletetweet/<%= tweet.author._id %>/<%= tweet._id %>?_method=DELETE"
+                            method="post" style="display:inline;">
+                            <button class="btn btn-danger"><svg class="bi" width="1em" height="1em"
                                     style="fill: white;">
-                                    <use xlink:href="#heart-filled" />
+                                    <use xlink:href="#trashcan"/>
                                 </svg></button>
-                            <button class="btn btn-primary"><svg class="bi" width="1em" height="1em"
-                                    style="fill: white;">
-                                    <use xlink:href="#trashcan" />
-                                </svg></button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+            function likeTweet(btn)
+            {
+                btn.children[0].setAttribute('style','fill: red;')
+            }
+        </script>
         <% } %>

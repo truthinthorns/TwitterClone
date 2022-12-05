@@ -35,20 +35,24 @@ const UserSchema = new Schema({
 
 UserSchema.plugin(passportLocalMongoose);
 
-//credits to https://stackoverflow.com/questions/24023443/passport-local-mongoose-when-i-update-a-records-username-im-logged-out-why
-UserSchema.statics.serializeUser = function() {
-    return function(user, cb) {
-        cb(null, user._id);
-    }
-};
+// this 'works', but if i login with other info, it seems to default to whoever I logged in with first.
+// untested theory. I just saw it didn't work, saw what happened, and assumed that's what happened.
+// will need to do something with serializing/deserializing users, though.
+// it DID allow me to change username without having to log back in. I may be missing something somewhere.
 
 //credits to https://stackoverflow.com/questions/24023443/passport-local-mongoose-when-i-update-a-records-username-im-logged-out-why
-UserSchema.statics.deserializeUser = function() {
-    let self = this;
+// UserSchema.statics.serializeUser = function() {
+//     return function(user, cb) {
+//         cb(null, user._id);
+//     }
+// };
 
-    return function(id, cb) {
-        self.findOne({id}, cb);
-    }
-};
+// //credits to https://stackoverflow.com/questions/24023443/passport-local-mongoose-when-i-update-a-records-username-im-logged-out-why
+// UserSchema.statics.deserializeUser = function() {
+//     let self = this;
+//     return function(id, cb) {
+//         self.findOne({id}, cb);
+//     }
+// };
 
 module.exports = mongoose.model('User',UserSchema);
