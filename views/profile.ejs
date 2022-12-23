@@ -35,8 +35,7 @@
             <h5 class="card-title text-light"><strong>
                     <%= user.name %>
                 </strong></h5>
-            <h6 class="card-subtitle mb-2 text-muted">@<%= user.username %>
-            </h6>
+            <h6 class="card-subtitle mb-2 text-muted">@<%= user.username %></h6>
             <p class="card-text text-light">
                 <%= user.bio %>
             </p>
@@ -48,15 +47,20 @@
                         <use xlink:href="#calendar" />
                     </svg> Joined <%= joinDate %>
             </p>
-            <p class="card-text text-light">Followers </p>
-            <p class="card-text text-light">Following </p>
+            <!-- Change these to be buttons so the list for both can be displayed when clicked. -->
+            <p class="card-text text-light">Followers <%= followerCount%></p>
+            <p class="card-text text-light">Following <%= followingCount%></p>
         </div>
         <div class="card-footer">
             <% if (currentUser && user._id.equals(currentUser._id)) { %>
                 <a href="/profile/<%= user._id %>/edit" class="card-link">Edit Profile</a>
-                <% } else { %>
-                    <button class="card-link btn btn-primary">Follow</button>
-                    <% } %>
+            <% } else { %>
+                <!-- Need to add something here to change the button if the user already follows the viewed user. -->
+                <form action="/follow/<%= user._id %>/<%= currentUser._id %>?_method=PUT"
+                    method="post" style="display:inline;">
+                    <button class="btn btn-primary">Follow</button>
+                </form>
+            <% } %>
         </div>
     </div>
     <% for (let tweet of tweets) {%>
@@ -74,7 +78,7 @@
                             <%= tweet.content %>
                         </p>
                         <hr>
-                        <button id="<%= tweet._id %>" class="btn btn-primary" onClick="likeTweet(this)"><svg class="bi" width="1em"
+                        <button id="<%= tweet._id %>" class="btn btn-primary"><svg class="bi" width="1em"
                                 height="1em" style="fill: white;">
                                 <use xlink:href="#heart-filled" />
                             </svg>
@@ -90,10 +94,4 @@
                 </div>
             </div>
         </div>
-        <script>
-            function likeTweet(btn)
-            {
-                btn.children[0].setAttribute('style','fill: red;')
-            }
-        </script>
         <% } %>

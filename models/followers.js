@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const FollowerSchema = new Schema({
-    user: [{
+    users: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
     }],

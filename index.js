@@ -13,7 +13,6 @@ const Tweet = require('./models/tweet');
 const Following = require('./models/following');
 const Followers = require('./models/followers');
 const moment = require('moment');
-//const { profile } = require('console');
 const catchAsync = require('./utils/CatchAsync');
 const { isLoggedIn, isTweetAuthor,isOwnProfile } = require('./middleware');
 
@@ -55,16 +54,6 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-//credits: https://bobbyhadz.com/blog/javascript-convert-month-number-to-name
-function getMonthName(month) {
-    const date = new Date();
-    date.setMonth(month);
-  
-    return date.toLocaleString('en-US', {
-      month: 'long',
-    });
-  }
-
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
@@ -90,6 +79,13 @@ app.post('/signup', catchAsync(async (req, res) => {
         const {username,name,dob,email,password}=req.body;
         const user = new User({username,name,dob,email,joinDate: new Date()});
         const registeredUser = await User.register(user, password);
+        const followers = new Followers({owner: registeredUser._id});
+        const following = new Following({owner: registeredUser._id});
+        const savedFollowers = await followers.save();
+        const savedFollowing = await following.save();
+        user.followers = savedFollowers._id;
+        user.following = savedFollowing._id;
+        await user.save();
         req.login(registeredUser, err => {
             if (err) return next(err);
             req.flash('success', 'Welcome to Kiwi Beans!');
@@ -139,14 +135,19 @@ app.post('/posttweet', isLoggedIn, catchAsync(async (req,res)=>{
 }))
 
 // first makes sure you're logged in
-// then looks for a user, and gets the join and birth month, and gets the user's tweets, then renders that user's profile page.
+// then looks for a user, and gets the join and birth month, the user's tweets, following & follower counts, then renders that user's profile page.
 app.get('/profile/:id', isLoggedIn, catchAsync(async(req,res)=>{
     const {id} = req.params;
-    const user = await User.findById(id).populate('followers').populate('following');
+    const user = await User.findById(id);
+    //get the count of followers and following
+    let followerCount = await Followers.aggregate([{$match: {owner: user._id}}, {$project: {users: {$size: '$users'}}}])
+    let followingCount = await Following.aggregate([{$match: {owner: user._id}}, {$project: {users: {$size: '$users'}}}])
+    followerCount = followerCount[0].users;
+    followingCount = followingCount[0].users;
     const joinDate = moment(user.joinDate).utc().format('MMMM YYYY')
     const birthDate = moment(user.dob).utc().format('MMMM Do, YYYY')
     const tweets = await Tweet.find({"author" : user._id}).populate('author');
-    res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets});
+    res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets,followerCount,followingCount});
 }))
 
 // first makes sure you're logged in
@@ -172,6 +173,27 @@ app.get('/profile/:id/edit', isLoggedIn,isOwnProfile, catchAsync(async(req,res)=
     const user = await User.findById(id);
     const dob = moment(user.dob).utc().format("YYYY-MM-DD");
     res.render('editprofile',{user,dob,title:'Edit Profile'});
+}))
+
+// first makes sure you're logged in.
+// then finds the followers record and adds the followed user to the list of following
+app.put('/follow/:followingid/:followerid', isLoggedIn, catchAsync(async(req,res)=>{
+    const {followingid,followerid} = req.params;
+    //get the User object representing the user to be followed (followee)
+    const userToBeFollowed = await User.findById(followingid);
+    //get the User object representing the user that is doing the following (follower)
+    const userFollowing = await User.findById(followerid);
+    //use following id from follower as the id to get the Following object representing the list of users they follow
+    const followingList = await Following.findById(userFollowing.following);
+    //use follower id from followee as the id to get the Follower object representing the list of users that follow them
+    const followerList = await Followers.findById(userToBeFollowed.followers);
+    //add the followee to the list of users the follower follows
+    await followingList.users.push(userToBeFollowed._id);
+    //add the follower to the list of users that follow the followee
+    await followerList.users.push(userFollowing._id);
+    await followingList.save();
+    await followerList.save();
+    res.redirect(`/profile/${followingid}`);
 }))
 
 // first makes sure you're logged in and you're the tweet author
