@@ -15,6 +15,7 @@ const Followers = require('./models/followers');
 const moment = require('moment');
 const catchAsync = require('./utils/CatchAsync');
 const { isLoggedIn, isTweetAuthor,isOwnProfile } = require('./middleware');
+const followers = require('./models/followers');
 
 mongoose.connect('mongodb://localhost:27017/portfolio', { useNewUrlParser: true, useUnifiedTopology: true })
 const db = mongoose.connection;
@@ -144,10 +145,20 @@ app.get('/profile/:id', isLoggedIn, catchAsync(async(req,res)=>{
     let followingCount = await Following.aggregate([{$match: {owner: user._id}}, {$project: {users: {$size: '$users'}}}])
     followerCount = followerCount[0].users;
     followingCount = followingCount[0].users;
+    const followerList = await Followers.findById(user.followers).select('users -_id');
+    const followingList = await Following.findById(user.following).select('users -_id');
+    const followers = [];
+    const following = [];
+    for(let follower of followerList.users){
+        followers.push(await User.findById(follower))
+    }
+    for(let followed of followingList.users){
+        following.push(await User.findById(followed))
+    }
     const joinDate = moment(user.joinDate).utc().format('MMMM YYYY')
     const birthDate = moment(user.dob).utc().format('MMMM Do, YYYY')
     const tweets = await Tweet.find({"author" : user._id}).populate('author');
-    res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets,followerCount,followingCount});
+    res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets,followerCount,followingCount,followers,following});
 }))
 
 // first makes sure you're logged in

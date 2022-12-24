@@ -35,7 +35,8 @@
             <h5 class="card-title text-light"><strong>
                     <%= user.name %>
                 </strong></h5>
-            <h6 class="card-subtitle mb-2 text-muted">@<%= user.username %></h6>
+            <h6 class="card-subtitle mb-2 text-muted">@<%= user.username %>
+            </h6>
             <p class="card-text text-light">
                 <%= user.bio %>
             </p>
@@ -48,19 +49,83 @@
                     </svg> Joined <%= joinDate %>
             </p>
             <!-- Change these to be buttons so the list for both can be displayed when clicked. -->
-            <p class="card-text text-light">Followers <%= followerCount%></p>
-            <p class="card-text text-light">Following <%= followingCount%></p>
+            <!-- <p class="card-text text-light">Followers <%= //followerCount%></p>
+            <p class="card-text text-light">Following <%= //followingCount%></p> -->
+
+            <!-- Button trigger modal -->
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal"
+                data-bs-target="#followersPopup">Followers <%= followerCount%></button>
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal"
+                data-bs-target="#followingPopup">Following <%= followingCount%></button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="followersPopup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="followersPopupLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5 text-dark" id="followersPopupLabel">Followers
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            
+                                    <% for(let follower of followers) { %>
+                                        <div class="card mb-3">
+                                            <div class="row g-0">
+                                              <div class="col-md-4">
+                                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" class="img-fluid 
+                                                rounded-circle" alt="">
+                                              </div>
+                                              <div class="col-md-8">
+                                                <div class="card-body">
+                                                  <h5 class="card-title text-dark"><%= follower.name %></h5>
+                                                  <p class="card-text text-dark"><%= follower.username %></p>
+                                                  <a href="/profile/<%= follower._id %>" class="btn btn-primary">View Profile</a>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                    <% } %>
+                              
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="followingPopup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="followingPopupLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5 text-dark" id="followingPopupLabel">Following
+                            </h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="modal-text fs-5 text-dark">Show up mf</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="card-footer">
             <% if (currentUser && user._id.equals(currentUser._id)) { %>
                 <a href="/profile/<%= user._id %>/edit" class="card-link">Edit Profile</a>
-            <% } else { %>
-                <!-- Need to add something here to change the button if the user already follows the viewed user. -->
-                <form action="/follow/<%= user._id %>/<%= currentUser._id %>?_method=PUT"
-                    method="post" style="display:inline;">
-                    <button class="btn btn-primary">Follow</button>
-                </form>
-            <% } %>
+                <% } else { %>
+                    <!-- Need to add something here to change the button if the user already follows the viewed user. -->
+                    <form action="/follow/<%= user._id %>/<%= currentUser._id %>?_method=PUT" method="post"
+                        style="display:inline;">
+                        <button class="btn btn-primary">Follow</button>
+                    </form>
+                    <% } %>
         </div>
     </div>
     <% for (let tweet of tweets) {%>
@@ -78,8 +143,8 @@
                             <%= tweet.content %>
                         </p>
                         <hr>
-                        <button id="<%= tweet._id %>" class="btn btn-primary"><svg class="bi" width="1em"
-                                height="1em" style="fill: white;">
+                        <button id="<%= tweet._id %>" class="btn btn-primary"><svg class="bi" width="1em" height="1em"
+                                style="fill: white;">
                                 <use xlink:href="#heart-filled" />
                             </svg>
                         </button>
@@ -87,7 +152,7 @@
                             method="post" style="display:inline;">
                             <button class="btn btn-danger"><svg class="bi" width="1em" height="1em"
                                     style="fill: white;">
-                                    <use xlink:href="#trashcan"/>
+                                    <use xlink:href="#trashcan" />
                                 </svg></button>
                         </form>
                     </div>
