@@ -48,11 +48,8 @@
                         <use xlink:href="#calendar" />
                     </svg> Joined <%= joinDate %>
             </p>
-            <!-- Change these to be buttons so the list for both can be displayed when clicked. -->
-            <!-- <p class="card-text text-light">Followers <%= //followerCount%></p>
-            <p class="card-text text-light">Following <%= //followingCount%></p> -->
 
-            <!-- Button trigger modal -->
+            <!-- Button trigger modals for followers and following -->
             <button class="btn btn-primary" type="button" data-bs-toggle="modal"
                 data-bs-target="#followersPopup">Followers <%= followerCount%></button>
             <button class="btn btn-primary" type="button" data-bs-toggle="modal"
@@ -69,25 +66,15 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            
-                                    <% for(let follower of followers) { %>
-                                        <div class="card mb-3">
-                                            <div class="row g-0">
-                                              <div class="col-md-4">
-                                                <img src="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" class="img-fluid 
-                                                rounded-circle" alt="">
-                                              </div>
-                                              <div class="col-md-8">
-                                                <div class="card-body">
-                                                  <h5 class="card-title text-dark"><%= follower.name %></h5>
-                                                  <p class="card-text text-dark"><%= follower.username %></p>
-                                                  <a href="/profile/<%= follower._id %>" class="btn btn-primary">View Profile</a>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                    <% } %>
-                              
+                            <% for(let follower of followers) { %>
+                                    <div class="card" style="width: 18rem;">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-dark"><%= follower.name %></h5>
+                                        <p class="card-text text-dark">@<%= follower.username %></p>
+                                        <a href="/profile/<%= follower._id %>" class="btn btn-primary">View Profile</a>
+                                    </div>
+                                    </div>
+                            <% } %>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -101,12 +88,19 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5 text-dark" id="followingPopupLabel">Following
-                            </h1>
+                            <h1 class="modal-title fs-5 text-dark" id="followingPopupLabel">Following</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p class="modal-text fs-5 text-dark">Show up mf</p>
+                            <% for(let follow of following) { %>
+                                <div class="card" style="width: 18rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title text-dark"><%= follow.name %></h5>
+                                    <p class="card-text text-dark">@<%= follow.username %></p>
+                                    <a href="/profile/<%= follow._id %>" class="btn btn-primary">View Profile</a>
+                                </div>
+                                </div>
+                        <% } %>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -118,14 +112,18 @@
 
         <div class="card-footer">
             <% if (currentUser && user._id.equals(currentUser._id)) { %>
-                <a href="/profile/<%= user._id %>/edit" class="card-link">Edit Profile</a>
-                <% } else { %>
-                    <!-- Need to add something here to change the button if the user already follows the viewed user. -->
-                    <form action="/follow/<%= user._id %>/<%= currentUser._id %>?_method=PUT" method="post"
+                <a href="/profile/<%= user._id %>/edit" class="btn btn-primary">Edit Profile</a>
+                <% } else if(followerList.users.includes(currentUser._id)) { %>
+                    <form action="/unfollow/<%= user._id %>/<%= currentUser._id %>?_method=PUT" method="post"
                         style="display:inline;">
-                        <button class="btn btn-primary">Follow</button>
+                        <button class="btn btn-primary">Unfollow</button>
                     </form>
-                    <% } %>
+                    <% } else { %>
+                        <form action="/follow/<%= user._id %>/<%= currentUser._id %>?_method=PUT" method="post"
+                            style="display:inline;">
+                            <button class="btn btn-primary">Follow</button>
+                        </form>
+                     <% } %>  
         </div>
     </div>
     <% for (let tweet of tweets) {%>
@@ -148,6 +146,7 @@
                                 <use xlink:href="#heart-filled" />
                             </svg>
                         </button>
+                        <% if (currentUser && user._id.equals(currentUser._id)) { %>
                         <form action="/deletetweet/<%= tweet.author._id %>/<%= tweet._id %>?_method=DELETE"
                             method="post" style="display:inline;">
                             <button class="btn btn-danger"><svg class="bi" width="1em" height="1em"
@@ -155,6 +154,7 @@
                                     <use xlink:href="#trashcan" />
                                 </svg></button>
                         </form>
+                        <% } %> 
                     </div>
                 </div>
             </div>

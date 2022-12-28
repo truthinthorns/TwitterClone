@@ -158,7 +158,7 @@ app.get('/profile/:id', isLoggedIn, catchAsync(async(req,res)=>{
     const joinDate = moment(user.joinDate).utc().format('MMMM YYYY')
     const birthDate = moment(user.dob).utc().format('MMMM Do, YYYY')
     const tweets = await Tweet.find({"author" : user._id}).populate('author');
-    res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets,followerCount,followingCount,followers,following});
+    res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets,followerList,followerCount,followingCount,followers,following});
 }))
 
 // first makes sure you're logged in
@@ -187,23 +187,65 @@ app.get('/profile/:id/edit', isLoggedIn,isOwnProfile, catchAsync(async(req,res)=
 }))
 
 // first makes sure you're logged in.
-// then finds the followers record and adds the followed user to the list of following
+// then finds the followers record and adds the followed user to the list of following,
+// then adds the following user to the followed user's follower list
 app.put('/follow/:followingid/:followerid', isLoggedIn, catchAsync(async(req,res)=>{
     const {followingid,followerid} = req.params;
+
     //get the User object representing the user to be followed (followee)
     const userToBeFollowed = await User.findById(followingid);
     //get the User object representing the user that is doing the following (follower)
     const userFollowing = await User.findById(followerid);
-    //use following id from follower as the id to get the Following object representing the list of users they follow
+
+    //use following id from userFollowing as the id to get the Following object representing the list of users they follow
     const followingList = await Following.findById(userFollowing.following);
-    //use follower id from followee as the id to get the Follower object representing the list of users that follow them
+    //use follower id from userToBeFollowed as the id to get the Follower object representing the list of users that follow them
     const followerList = await Followers.findById(userToBeFollowed.followers);
+
     //add the followee to the list of users the follower follows
     await followingList.users.push(userToBeFollowed._id);
     //add the follower to the list of users that follow the followee
     await followerList.users.push(userFollowing._id);
+
     await followingList.save();
     await followerList.save();
+
+    res.redirect(`/profile/${followingid}`);
+}))
+
+// first makes sure you're logged in.
+// then finds the followers record and removes the unfollowed user from the list of following,
+// then removes the unfollowing user from the unfollowed user's list of followers
+app.put('/unfollow/:followingid/:followerid', isLoggedIn, catchAsync(async(req,res)=>{
+    const {followingid,followerid} = req.params;
+
+    //get the User object representing the user to be unfollowed (unfollowee)
+    const userToBeUnfollowed = await User.findById(followingid);
+    //get the User object representing the user that is doing the unfollowing (unfollower)
+    const userUnfollowing = await User.findById(followerid);
+
+    //use following id from userUnfollowing as the id to get the Following object representing the list of users they follow
+    const followingList = await Following.findById(userUnfollowing.following);
+    //use follower id from userToBeUnfollowed as the id to get the Follower object representing the list of users that follow them
+    const followerList = await Followers.findById(userToBeUnfollowed.followers);
+
+    //check to make sure userToBeUnfollowed._id is found in the list of users that are followed
+    const followingListIndex = followingList.users.indexOf(userToBeUnfollowed._id)
+
+    //check to make sure userToBeUnfollowed._id is found in the list of users that are followed
+    const followerListIndex = followerList.users.indexOf(userUnfollowing._id)
+
+    //remove the unfollowee from the list of users the unfollower follows
+    if(followingListIndex>-1)
+        await followingList.users.splice(followingListIndex,1);
+    
+    //remove the unfollower from the list of users that follow the unfollowee
+    if(followerListIndex>-1)
+        await followerList.users.splice(followerListIndex,1);
+
+    await followingList.save();
+    await followerList.save();
+
     res.redirect(`/profile/${followingid}`);
 }))
 
