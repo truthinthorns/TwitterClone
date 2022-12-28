@@ -1,4 +1,4 @@
-# Portfolio2
+# Twitter Clone
 <p>WORK IN PROGRESS</p>
 <ul>
 <li>This is a project intended as practice to clone Twitter. It is <b><i>not</i></b> anywhere near as good as Twitter. This project uses EJS, Passport, Mongoose, Express, Bootstrap, etc.</li>
