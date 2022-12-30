@@ -1,0 +1,16 @@
+<% layout('layouts/boilerplate') %>
+
+<h1>Search Results</h1>
+<% for (let res of results) {%>
+    <div class="card mb-3 w-50 offset-3 bg-dark">
+        <div class="row">
+            <div class="col">
+                <div class="card-body">
+                    <h4 class="card-title text-light">
+                        @<a href="/profile/<%= res._id %>"><%= res.username %></a>
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>

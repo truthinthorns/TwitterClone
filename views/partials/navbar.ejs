@@ -10,10 +10,12 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
   
         <div class="navbar-nav ms-auto">
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search for users" aria-label="Search">
+          <% if (currentUser) { %>
+          <form class="d-flex" role="search" action="/search" method="get">
+            <input class="form-control me-2" type="search" placeholder="Search for users" aria-label="Search" id='userSearch' name="userSearch" minlength="3" required>
             <button class="btn btn-secondary" type="submit">Search</button>
           </form>
+          <% } %>
           </div>
           <div class="navbar-nav ms-auto">
           <% if (!currentUser) { %>
@@ -36,3 +38,4 @@
       </div>
     </div>
   </nav>
+  <script src="/javascript/validateForms.js"></script>

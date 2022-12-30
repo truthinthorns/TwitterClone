@@ -11,27 +11,57 @@
                         <label for="s_nameInput" class="form-label text-light">Full Name</label>
                         <input type="text" class="form-control" id="s_nameInput" name="name"
                             required>
+                            <div class="invalid-feedback">
+                                Please enter your name.
+                            </div>
+                            <div class="valid-feedback">
+                                Nice!
+                            </div> 
                     </div>
                     <div class="mb-2">
                         <label for="s_usernameInput" class="form-label text-light">Username</label>
                         <input type="text" class="form-control" id="s_usernameInput" name="username" aria-describedby="s_usernameHelp"
                             required>
                         <div id="s_usernameHelp" class="form-text">This is what you will use to login.</div>
+                        <div class="invalid-feedback">
+                            Please enter a username.
+                        </div>
+                        <div class="valid-feedback">
+                            Nice!
+                        </div> 
                     </div>
                     <div class="mb-2">
                         <label for="s_dobInput" class="form-label text-light">Date of Birth</label>
                         <input type="date" class="form-control" id="s_dobInput" name="dob" required>
+                        <div class="invalid-feedback">
+                            Please enter a date of birth.
+                        </div>
+                        <div class="valid-feedback">
+                            Nice!
+                        </div> 
                     </div>
                     <div class="mb-2">
                         <label for="s_emailInput" class="form-label text-light">Email address</label>
                         <input type="email" class="form-control" id="s_emailInput"
                             aria-describedby="s_emailHelp" name="email" required>
+                        <div class="invalid-feedback">
+                            Please enter an email.
+                        </div>
+                        <div class="valid-feedback">
+                            Nice!
+                        </div> 
                     </div>
                     <div class="mb-4">
                         <label for="s_passwordInput" class="form-label text-light">Password</label>
                         <input type="password" class="form-control" id="s_passwordInput"
-                            aria-describedby="s_passwordHelp" name="password" required>
+                            aria-describedby="s_passwordHelp" name="password" minlength="8" maxlength="25" required>
                         <div id="s_passwordHelp" class="form-text">Must be between 8 and 25 characters.</div>
+                        <div class="invalid-feedback">
+                            Please enter a password.
+                        </div>
+                        <div class="valid-feedback">
+                            Nice!
+                        </div> 
                     </div>
                     <div class="mb-2">
                         <button type="submit" class="btn btn-primary">Sign Up</button>

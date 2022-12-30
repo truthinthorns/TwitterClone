@@ -10,11 +10,23 @@
                         <div class="mb-2">
                             <label for="s_fullnameInput" class="form-label text-light">Username</label>
                             <input type="text" class="form-control" id="s_usernameInput" name="username" required>
+                            <div class="invalid-feedback">
+                                Please enter a username.
+                            </div>
+                            <div class="valid-feedback">
+                                Nice!
+                            </div>                        
                         </div>
                         <div class="mb-4">
                             <label for="s_passwordInput" class="form-label text-light">Password</label>
                             <input type="password" class="form-control" id="s_passwordInput" name="password"
                                 required>
+                            <div class="invalid-feedback">
+                                Please enter a password.
+                            </div>
+                            <div class="valid-feedback">
+                                Nice!
+                            </div>   
                         </div>
                         <div class="mb-2">
                             <button type="submit" class="btn btn-primary">Login</button>

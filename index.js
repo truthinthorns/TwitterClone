@@ -187,29 +187,42 @@ app.get('/profile/:id/edit', isLoggedIn,isOwnProfile, catchAsync(async(req,res)=
 }))
 
 // first makes sure you're logged in.
+// then checks the following and follower lists to make sure the user is not already following the other user,
 // then finds the followers record and adds the followed user to the list of following,
 // then adds the following user to the followed user's follower list
 app.put('/follow/:followingid/:followerid', isLoggedIn, catchAsync(async(req,res)=>{
     const {followingid,followerid} = req.params;
 
-    //get the User object representing the user to be followed (followee)
+    //get the User object representing the user to be followed (followee: A)
     const userToBeFollowed = await User.findById(followingid);
-    //get the User object representing the user that is doing the following (follower)
+    //get the User object representing the user that is doing the following (follower: B)
     const userFollowing = await User.findById(followerid);
 
-    //use following id from userFollowing as the id to get the Following object representing the list of users they follow
+    //use following id from B as the id to get the Following object representing the list of users they follow
     const followingList = await Following.findById(userFollowing.following);
-    //use follower id from userToBeFollowed as the id to get the Follower object representing the list of users that follow them
+    //use follower id from A as the id to get the Follower object representing the list of users that follow them
     const followerList = await Followers.findById(userToBeFollowed.followers);
 
-    //add the followee to the list of users the follower follows
-    await followingList.users.push(userToBeFollowed._id);
-    //add the follower to the list of users that follow the followee
-    await followerList.users.push(userFollowing._id);
+    //check if B is already following A
+    const followingListIndex = followingList.users.indexOf(userToBeFollowed._id)
 
-    await followingList.save();
-    await followerList.save();
+    //probably unnecessary. if followingListIndex returns -1, it should be fine. but better safe than sorry? maybe?
+    //check if A is already followed by B
+    const followerListIndex = followerList.users.indexOf(userFollowing._id)
 
+    //if they both equal -1, B is not following A, and A is not in B's follower list
+    if(followingListIndex ===-1 && followerListIndex === -1){
+        //add A to the list of users B follows
+        await followingList.users.push(userToBeFollowed._id);
+        //add B to the list of users that follow A
+        await followerList.users.push(userFollowing._id);
+
+        //save the updated lists
+        await followingList.save();
+        await followerList.save();
+    }
+
+    req.flash('success','Followed User!');
     res.redirect(`/profile/${followingid}`);
 }))
 
@@ -219,33 +232,35 @@ app.put('/follow/:followingid/:followerid', isLoggedIn, catchAsync(async(req,res
 app.put('/unfollow/:followingid/:followerid', isLoggedIn, catchAsync(async(req,res)=>{
     const {followingid,followerid} = req.params;
 
-    //get the User object representing the user to be unfollowed (unfollowee)
+    //get the User object representing the user to be unfollowed (unfollowee: A)
     const userToBeUnfollowed = await User.findById(followingid);
-    //get the User object representing the user that is doing the unfollowing (unfollower)
+    //get the User object representing the user that is doing the unfollowing (unfollower: B)
     const userUnfollowing = await User.findById(followerid);
 
-    //use following id from userUnfollowing as the id to get the Following object representing the list of users they follow
+    //use following id from B as the id to get the Following object representing the list of users they follow
     const followingList = await Following.findById(userUnfollowing.following);
-    //use follower id from userToBeUnfollowed as the id to get the Follower object representing the list of users that follow them
+    //use follower id from A as the id to get the Follower object representing the list of users that follow them
     const followerList = await Followers.findById(userToBeUnfollowed.followers);
 
-    //check to make sure userToBeUnfollowed._id is found in the list of users that are followed
+    //check to make sure A._id is found in the list of users that are followed
     const followingListIndex = followingList.users.indexOf(userToBeUnfollowed._id)
 
-    //check to make sure userToBeUnfollowed._id is found in the list of users that are followed
+    //check to make sure B._id is found in the list of users that are followed
     const followerListIndex = followerList.users.indexOf(userUnfollowing._id)
 
-    //remove the unfollowee from the list of users the unfollower follows
-    if(followingListIndex>-1)
+    //if they both not equal to -1, B is following A, and A is in B's follower list
+    if(followingListIndex !==-1 && followerListIndex !==-1){
+        //remove A from the list of users B follows
         await followingList.users.splice(followingListIndex,1);
-    
-    //remove the unfollower from the list of users that follow the unfollowee
-    if(followerListIndex>-1)
+        //remove the A from the list of users that follow A
         await followerList.users.splice(followerListIndex,1);
 
-    await followingList.save();
-    await followerList.save();
+        //save the updated lists
+        await followingList.save();
+        await followerList.save();
+    }   
 
+    req.flash('success','Unfollowed User!');
     res.redirect(`/profile/${followingid}`);
 }))
 
@@ -262,6 +277,25 @@ app.delete('/deletetweet/:id/:tweetID',isLoggedIn,isTweetAuthor, catchAsync(asyn
     await Tweet.findByIdAndDelete(tweetID);
     req.flash('success','Deleted Tweet!');
     res.redirect(`/profile/${id}`);
+}))
+
+app.get('/search', isLoggedIn, catchAsync(async(req,res)=>{
+    const {userSearch} = req.query;
+    if(!userSearch || userSearch.length < 3){
+        console.log('invalid')
+        return;
+    }
+    const regexSearch1 = new RegExp(`${userSearch}*`);
+    const regexSearch2 = new RegExp(`${userSearch}`);
+    const users = await User.find();
+    const results = []
+    for(let user of users){
+        if(regexSearch1.test(user.username) || regexSearch2.test(user.username) || regexSearch1.test(user.name) || regexSearch2.test(user.name)){
+            results.push(user)
+        }
+    }
+    console.log('\n\n')
+    res.render('searchResults',{title:'Search Results', results});
 }))
 
 //to access the app, must open localhost:3000
