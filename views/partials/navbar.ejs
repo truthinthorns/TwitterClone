@@ -1,6 +1,7 @@
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">
+        <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24">
         Kiwi Beans
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -13,7 +14,7 @@
           <% if (currentUser) { %>
           <form class="d-flex" role="search" action="/search" method="get">
             <input class="form-control me-2" type="search" placeholder="Search for users" aria-label="Search" id='userSearch' name="userSearch" minlength="3" required>
-            <button class="btn btn-secondary" type="submit">Search</button>
+            <button class="btn btn-outline-light" type="submit">Search</button>
           </form>
           <% } %>
           </div>
@@ -22,11 +23,11 @@
             <a class="nav-link" href="/login">Login</a>
             <a class="nav-link" href="/signup">Sign Up</a>
             <% } else {%>
-                    <div class="nav-item dropdown ms-auto dropstart">
-                        <a class="nav-link dropdown-toggle" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="nav-item dropdown ms-auto">
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                           <%= currentUser.username %>
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu dropdown-menu-end">
                           <li><a class="dropdown-item" href="/profile/<%= currentUser._id %>">View Profile</a></li>
                           <li><hr class="dropdown-divider"></li>
                           <li><a class="dropdown-item" href="/logout">Logout</a></li>
