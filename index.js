@@ -279,6 +279,8 @@ app.delete('/deletetweet/:id/:tweetID',isLoggedIn,isTweetAuthor, catchAsync(asyn
     res.redirect(`/profile/${id}`);
 }))
 
+// checks to make sure you're logged in
+// then get checks all user's name and username to see if it matches the search
 app.get('/search', isLoggedIn, catchAsync(async(req,res)=>{
     const {userSearch} = req.query;
     if(!userSearch || userSearch.length < 3){
