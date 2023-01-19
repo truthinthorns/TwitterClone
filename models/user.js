@@ -26,12 +26,10 @@ const UserSchema = new Schema({
     followers: {
         type: Schema.Types.ObjectId,
         ref: 'Follower',
-        //required: true
     },
     following: {
         type: Schema.Types.ObjectId,
         ref: 'Following',
-        //required: true
     }
 })
 

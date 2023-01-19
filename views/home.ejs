@@ -26,11 +26,26 @@
                         <p class="card-text text-light">
                             <%= tweet.content %>
                         </p>
-                        <button class="btn btn-primary"><svg class="bi" width="1em" height="1em"
-                                style="fill: white;">
-                                <use xlink:href="#heart-filled" />
-                        </svg>
-                    </button>
+                        <!-- make sure user is logged in, and they're NOT on their own profile page. -->
+                        <% if (currentUser && !tweet.author._id.equals(currentUser._id)) { %>
+                                <form action="/liketweet/<%= tweet._id %>/<%= currentUser._id %>?_method=PUT&loc=home"
+                                    method="post" style="display:inline;">
+                                    <button id="like" class="btn btn-primary like">
+                                        <!-- show the white heart if it hasn't been liked by the current user. red heart otherwise -->
+                                        <% if(!tweet.likesRef.likers.includes(currentUser._id)) {%> 
+                                            <svg class="bi" width="1em" height="1em"
+                                            style="fill: white;">
+                                            <use xlink:href="#heart-filled" />
+                                            </svg>
+                                        <% } else{ %> 
+                                            <svg class="bi" width="1em" height="1em"
+                                            style="fill: red;">
+                                            <use xlink:href="#heart-filled" />
+                                            </svg>
+                                        <% } %> 
+                                </button>
+                                </form>
+                                <% } %> 
                     </div>
                 </div>
             </div>

@@ -8,16 +8,19 @@ const flash = require('connect-flash');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+
+//models
 const User = require('./models/user');
 const Tweet = require('./models/tweet');
 const Following = require('./models/following');
 const Followers = require('./models/followers');
+const Likes = require('./models/likes');
+
 const moment = require('moment');
 const catchAsync = require('./utils/CatchAsync');
-const { isLoggedIn, isTweetAuthor,isOwnProfile } = require('./middleware');
-const followers = require('./models/followers');
+const { isLoggedIn, isTweetAuthor,isOwnProfile, isNOTTweetAuthor } = require('./middleware');
 
-mongoose.connect('mongodb://localhost:27017/portfolio', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost:27017/twitterClone', { useNewUrlParser: true, useUnifiedTopology: true })
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection Error'));
 db.once('open', () => {
@@ -65,7 +68,7 @@ app.use((req, res, next) => {
 // first makes sure you're logged in
 // then gets ALL tweets (temporary), and renders the homepage.
 app.get('/', isLoggedIn, catchAsync(async (req, res) => {
-    const tweets = await Tweet.find({}).populate('author');
+    const tweets = await Tweet.find({}).populate('author').populate('likesRef');
     res.render('home.ejs',{title: 'Home',tweets});
 }))
 
@@ -130,7 +133,11 @@ app.post('/posttweet', isLoggedIn, catchAsync(async (req,res)=>{
     const {content} = req.body;
     const formattedTimestamp = moment(new Date()).utc().format("ddd, MMM Do YYYY, h:mm A");
     const tweet = new Tweet({author: req.user._id, content,timestamp: new Date(),formattedTimestamp,likes: 0});
+    const likes = new Likes({author: req.user._id});
+    const likesRef = await likes.save();
+    tweet.likesRef = likes._id;
     await tweet.save();
+    
     req.flash('success','Successfully Composed Tweet');
     res.redirect('/');
 }))
@@ -157,7 +164,8 @@ app.get('/profile/:id', isLoggedIn, catchAsync(async(req,res)=>{
     }
     const joinDate = moment(user.joinDate).utc().format('MMMM YYYY')
     const birthDate = moment(user.dob).utc().format('MMMM Do, YYYY')
-    const tweets = await Tweet.find({"author" : user._id}).populate('author');
+    const tweets = await Tweet.find({"author" : user._id}).populate('author').populate('likesRef');
+
     res.render('profile',{title: 'Profile',user,joinDate,birthDate,tweets,followerList,followerCount,followingCount,followers,following});
 }))
 
@@ -279,6 +287,39 @@ app.delete('/deletetweet/:id/:tweetID',isLoggedIn,isTweetAuthor, catchAsync(asyn
     res.redirect(`/profile/${id}`);
 }))
 
+// first makes sure you're logged in and you're NOT the tweet author
+// then looks for the tweet (params), gets the likesRef from it, and looks for the user (params), then adds the user to the likers list.
+// if the user previously liked this tweet, it removes the user from the likers list.
+// for now, it reloads the page. It should definitely not do that.
+// might be able to just put this code (with a few mods) into a script tag or different file.
+app.put('/liketweet/:tweetID/:likerID',isLoggedIn,isNOTTweetAuthor,catchAsync(async(req,res)=>{
+    const {tweetID,likerID} = req.params;
+    const redir = req.query.loc;
+
+    //need to find the tweet, then the likes model, then add the user to the likers list
+    const tweet = await Tweet.findById(tweetID);
+    const likes = await Likes.findById(tweet.likesRef);
+    const user = await User.findById(likerID);
+
+    const likerIndex = likes.likers.indexOf(user._id)
+
+    //if likerIndex is -1, then the user hasn't liked this tweet. (or they unliked it at some point)
+    if(likerIndex === -1){
+        //add the liker to the likes likersList
+        likes.likers.push(user._id);
+    }
+    else{
+        //remove the liker to the likes likersList
+        await likes.likers.splice(likerIndex,1);
+    }
+    await likes.save()
+
+    if(redir==='profile')
+        res.redirect(`/profile/${tweet.author}`);
+    else
+        res.redirect('/');
+}))
+
 app.get('/search', isLoggedIn, catchAsync(async(req,res)=>{
     const {userSearch} = req.query;
     if(!userSearch || userSearch.length < 3){
@@ -294,7 +335,6 @@ app.get('/search', isLoggedIn, catchAsync(async(req,res)=>{
             results.push(user)
         }
     }
-    console.log('\n\n')
     res.render('searchResults',{title:'Search Results', results});
 }))
 

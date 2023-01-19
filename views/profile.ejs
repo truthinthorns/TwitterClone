@@ -111,6 +111,8 @@
         </div>
 
         <div class="card-footer">
+            <!-- make sure user is logged in, and they ARE on their own profile page. -->
+            <!-- if they are on their own page, show the button to edit their profile. Show button to follow otherwise. -->
             <% if (currentUser && user._id.equals(currentUser._id)) { %>
                 <a href="/profile/<%= user._id %>/edit" class="btn btn-primary">Edit Profile</a>
                 <% } else if(followerList.users.includes(currentUser._id)) { %>
@@ -141,11 +143,27 @@
                             <%= tweet.content %>
                         </p>
                         <hr>
-                        <button id="<%= tweet._id %>" class="btn btn-primary"><svg class="bi" width="1em" height="1em"
-                                style="fill: white;">
-                                <use xlink:href="#heart-filled" />
-                            </svg>
-                        </button>
+                        <!-- make sure user is logged in, and they're NOT on their own profile page. -->
+                        <% if (currentUser && !user._id.equals(currentUser._id)) { %>
+                            <form action="/liketweet/<%= tweet._id %>/<%= currentUser._id %>?_method=PUT&loc=profile"
+                                method="post" style="display:inline;">
+                                <button id="like" class="btn btn-primary like">
+                                    <!-- show the white heart if it hasn't been liked by the current user. red heart otherwise -->
+                                    <% if(!tweet.likesRef.likers.includes(currentUser._id)) {%> 
+                                        <svg class="bi" width="1em" height="1em"
+                                        style="fill: white;">
+                                        <use xlink:href="#heart-filled" />
+                                        </svg>
+                                    <% } else{ %> 
+                                        <svg class="bi" width="1em" height="1em"
+                                        style="fill: red;">
+                                        <use xlink:href="#heart-filled" />
+                                        </svg>
+                                    <% } %> 
+                            </button>
+                            </form>
+                            <% } %> 
+                        <!-- make sure user is logged in, and they ARE on their own profile page. -->
                         <% if (currentUser && user._id.equals(currentUser._id)) { %>
                         <form action="/deletetweet/<%= tweet.author._id %>/<%= tweet._id %>?_method=DELETE"
                             method="post" style="display:inline;">

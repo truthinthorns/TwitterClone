@@ -18,10 +18,10 @@ const TweetSchema = new Schema({
         type: String,
         required: true
     },
-    likes: {
-        type: Number,
-        required: true
-    }
+    likesRef: {
+        type: Schema.Types.ObjectId,
+        ref: 'Likes'
+    },
 })
 
 module.exports = mongoose.model('Tweet',TweetSchema);

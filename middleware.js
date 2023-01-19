@@ -17,7 +17,16 @@ module.exports.isTweetAuthor = catchAsync(async(req,res,next)=>{
     const {id,tweetID} = req.params;
     const tweet = await Tweet.findById(tweetID).populate('author');
     if(!tweet.author.equals(req.user._id)){
-        console.log('You do not have permission to do that!');
+        req.flash('error','You do not have permission to do that!');
+        return res.redirect(`/profile/${id}`);
+    }
+    next();
+})
+
+module.exports.isNOTTweetAuthor = catchAsync(async(req,res,next)=>{
+    const {id,tweetID} = req.params;
+    const tweet = await Tweet.findById(tweetID).populate('author');
+    if(tweet.author.equals(req.user._id)){
         req.flash('error','You do not have permission to do that!');
         return res.redirect(`/profile/${id}`);
     }
