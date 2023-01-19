@@ -7,8 +7,11 @@
             <div class="col">
                 <div class="card-body">
                     <h4 class="card-title text-light">
-                        @<a href="/profile/<%= res._id %>"><%= res.username %></a>
+                        <%= res.name %>
                     </h4>
+                    <div class="card-text">
+                        <p><a href="/profile/<%= res._id %>">@<%= res.username %></a></p>
+                    </div>
                 </div>
             </div>
         </div>

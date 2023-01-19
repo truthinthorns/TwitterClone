@@ -20,7 +20,7 @@
                 <div class="col">
                     <div class="card-body">
                         <h4 class="card-title text-light">
-                            @<a href="/profile/<%= tweet.author._id %>"><%= tweet.author.username %></a>
+                            <a href="/profile/<%= tweet.author._id %>">@<%= tweet.author.username %></a>
                         </h4>
                         <p class="card-text text-muted"><%= tweet.formattedTimestamp %> UTC</p>
                         <p class="card-text text-light">

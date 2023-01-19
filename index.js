@@ -320,6 +320,41 @@ app.put('/liketweet/:tweetID/:likerID',isLoggedIn,isNOTTweetAuthor,catchAsync(as
         res.redirect('/');
 }))
 
+// first makes sure you're logged in and you're NOT the tweet author
+// then looks for the tweet (params), gets the likesRef from it, and looks for the user (params), then adds the user to the likers list.
+// if the user previously liked this tweet, it removes the user from the likers list.
+// for now, it reloads the page. It should definitely not do that.
+// might be able to just put this code (with a few mods) into a script tag or different file.
+app.put('/liketweet/:tweetID/:likerID',isLoggedIn,isNOTTweetAuthor,catchAsync(async(req,res)=>{
+    const {tweetID,likerID} = req.params;
+    const redir = req.query.loc;
+
+    //need to find the tweet, then the likes model, then add the user to the likers list
+    const tweet = await Tweet.findById(tweetID);
+    const likes = await Likes.findById(tweet.likesRef);
+    const user = await User.findById(likerID);
+
+    const likerIndex = likes.likers.indexOf(user._id)
+
+    //if likerIndex is -1, then the user hasn't liked this tweet. (or they unliked it at some point)
+    if(likerIndex === -1){
+        //add the liker to the likes likersList
+        likes.likers.push(user._id);
+    }
+    else{
+        //remove the liker to the likes likersList
+        await likes.likers.splice(likerIndex,1);
+    }
+    await likes.save()
+
+    if(redir==='profile')
+        res.redirect(`/profile/${tweet.author}`);
+    else
+        res.redirect('/');
+}))
+
+// checks to make sure you're logged in
+// then get checks all user's name and username to see if it matches the search
 app.get('/search', isLoggedIn, catchAsync(async(req,res)=>{
     const {userSearch} = req.query;
     if(!userSearch || userSearch.length < 3){
