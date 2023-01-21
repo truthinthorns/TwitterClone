@@ -13,29 +13,30 @@
                 </symbol>
         </svg>
 
-    <h1>Feed</h1>
+    
     <% if(alltweets.length > 1) {%> 
     <% for (let tweet of alltweets) {%>
-        <div class="card mb-3 w-50 offset-3 bg-dark">
+        <div class="card mb-3 w-50 offset-3" style="background-color: rgb(51, 15, 10);">
             <div class="row">
                 <div class="col">
                     <div class="card-body">
-                        <h4 class="card-title text-light">
-                            <a href="/profile/<%= tweet[0].author._id %>">@<%= tweet[0].author.username %></a>
-                        </h4>
-                        <p class="card-text text-muted"><%= tweet[0].formattedTimestamp %> UTC</p>
+                        <h4 class="card-title text-light" style="display:inline;"><b><%= tweet.author.name %></b></h4>
+                        <h5 class="card-title text-light" style="display:inline;">
+                            <a href="/profile/<%= tweet.author._id %>" style="color: rgb(200,200,200 );">@<%= tweet.author.username %></a>
+                        </h5>
+                        <p class="card-text text-muted"><%= tweet.formattedTimestamp %> UTC</p>
                         <p class="card-text text-light">
-                            <%= tweet[0].content %>
+                            <%= tweet.content %>
                         </p>
                         <!-- make sure user is logged in, and they're NOT on their own profile page. -->
-                        <% if (currentUser && !tweet[0].author._id.equals(currentUser._id)) { %>
-                                <form action="/liketweet/<%= tweet[0]._id %>/<%= currentUser._id %>?_method=PUT&loc=home"
+                        <% if (currentUser && !tweet.author._id.equals(currentUser._id)) { %>
+                                <form action="/liketweet/<%= tweet._id %>/<%= currentUser._id %>?_method=PUT&loc=home"
                                     method="post" style="display:inline;">
-                                    <button id="like" class="btn btn-primary like">
+                                    <button id="like" class="btn btn-light like">
                                         <!-- show the white heart if it hasn't been liked by the current user. red heart otherwise -->
-                                        <% if(!tweet[0].likesRef.likers.includes(currentUser._id)) {%> 
+                                        <% if(!tweet.likesRef.likers.includes(currentUser._id)) {%> 
                                             <svg class="bi" width="1em" height="1em"
-                                            style="fill: white;">
+                                            style="fill: black;">
                                             <use xlink:href="#heart-filled" />
                                             </svg>
                                         <% } else{ %> 

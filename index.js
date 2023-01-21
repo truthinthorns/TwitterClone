@@ -66,26 +66,36 @@ app.use((req, res, next) => {
 })
 
 // first makes sure you're logged in
-// then gets ALL tweets (temporary), and renders the homepage.
+// then gets ALL tweets from the user and their followed users (temporary), and renders the homepage.
 app.get('/', isLoggedIn, catchAsync(async (req, res) => {
-    
     const user = req.user;
     const alltweets = [];
 
     const usertweets = await Tweet.find({ "author": user._id }).populate('author').populate('likesRef');
-    if (usertweets.length > 0)
-        alltweets.push(usertweets);
+
+    if (usertweets.length > 0) {
+        for (let t of usertweets) {
+            alltweets.push(t);
+        }
+    }
 
     const followingList = await Following.findById(user.following).select('users -_id');
     let currFollowed = null;
     if (followingList.users.length > 0) {
         for (let followed of followingList.users) {
             currFollowed = await User.findById(followed);
-            alltweets.push(await Tweet.find({ "author": currFollowed._id }).populate('author').populate('likesRef'));
+            let currUserTweets = await Tweet.find({ "author": currFollowed._id }).populate('author').populate('likesRef');
+
+            if (currUserTweets.length > 0) {
+                for (let t of currUserTweets) {
+                    alltweets.push(t);
+                }
+            }
         }
     }
-    //Need to sort the tweets by timestamp.
-    //alltweets.sort((a, b) => b.timestamp - a.timestamp);
+
+    //sort the tweets in order of newest to oldest.
+    alltweets.sort((a, b) => b.timestamp - a.timestamp);
 
     res.render('home.ejs', { title: 'Home', alltweets });
 }))

@@ -27,7 +27,7 @@
         </symbol>
     </svg>
 
-    <div class="card mb-2 bg-dark">
+    <div class="card mb-2" style="background-color: rgb(51, 15, 10);">
         <div class="card-header mx-auto">
             <h2>Profile</h2>
         </div>
@@ -50,9 +50,9 @@
             </p>
 
             <!-- Button trigger modals for followers and following -->
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal"
+            <button class="btn btn-light" type="button" data-bs-toggle="modal"
                 data-bs-target="#followersPopup">Followers <%= followerCount%></button>
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal"
+            <button class="btn btn-light" type="button" data-bs-toggle="modal"
                 data-bs-target="#followingPopup">Following <%= followingCount%></button>
 
             <!-- Modal for showing user's followers-->
@@ -114,28 +114,29 @@
             <!-- make sure user is logged in, and they ARE on their own profile page. -->
             <!-- if they are on their own page, show the button to edit their profile. Show button to follow otherwise. -->
             <% if (currentUser && user._id.equals(currentUser._id)) { %>
-                <a href="/profile/<%= user._id %>/edit" class="btn btn-primary">Edit Profile</a>
+                <a href="/profile/<%= user._id %>/edit" class="btn btn-light">Edit Profile</a>
                 <% } else if(followerList.users.includes(currentUser._id)) { %>
                     <form action="/unfollow/<%= user._id %>/<%= currentUser._id %>?_method=PUT" method="post"
                         style="display:inline;">
-                        <button class="btn btn-primary">Unfollow</button>
+                        <button class="btn btn-light">Unfollow</button>
                     </form>
                     <% } else { %>
                         <form action="/follow/<%= user._id %>/<%= currentUser._id %>?_method=PUT" method="post"
                             style="display:inline;">
-                            <button class="btn btn-primary">Follow</button>
+                            <button class="btn btn-light">Follow</button>
                         </form>
                      <% } %>  
         </div>
     </div>
     <% for (let tweet of tweets) {%>
-        <div class="card mb-3 w-50 offset-3 bg-dark">
+        <div class="card mb-3 w-50 offset-3" style="background-color: rgb(51, 15, 10);">
             <div class="row">
                 <div class="col">
                     <div class="card-body">
-                        <h4 class="card-title text-light">
-                            @<%= tweet.author.username %>
-                        </h4>
+                        <h4 class="card-title text-light" style="display:inline;"><b><%= tweet.author.name %></b></h4>
+                        <h5 class="card-title text-light" style="display:inline;">
+                            <a href="/profile/<%= tweet.author._id %>" style="color: rgb(200,200,200 );">@<%= tweet.author.username %></a>
+                        </h5>
                         <p class="card-text text-muted">
                             <%= tweet.formattedTimestamp %> UTC
                         </p>
@@ -147,11 +148,11 @@
                         <% if (currentUser && !user._id.equals(currentUser._id)) { %>
                             <form action="/liketweet/<%= tweet._id %>/<%= currentUser._id %>?_method=PUT&loc=profile"
                                 method="post" style="display:inline;">
-                                <button id="like" class="btn btn-primary like">
+                                <button id="like" class="btn btn-light like">
                                     <!-- show the white heart if it hasn't been liked by the current user. red heart otherwise -->
                                     <% if(!tweet.likesRef.likers.includes(currentUser._id)) {%> 
                                         <svg class="bi" width="1em" height="1em"
-                                        style="fill: white;">
+                                        style="fill: black;">
                                         <use xlink:href="#heart-filled" />
                                         </svg>
                                     <% } else{ %> 
@@ -167,8 +168,8 @@
                         <% if (currentUser && user._id.equals(currentUser._id)) { %>
                         <form action="/deletetweet/<%= tweet.author._id %>/<%= tweet._id %>?_method=DELETE"
                             method="post" style="display:inline;">
-                            <button class="btn btn-danger"><svg class="bi" width="1em" height="1em"
-                                    style="fill: white;">
+                            <button class="btn btn-light"><svg class="bi" width="1em" height="1em"
+                                    style="fill: red;">
                                     <use xlink:href="#trashcan" />
                                 </svg></button>
                         </form>
