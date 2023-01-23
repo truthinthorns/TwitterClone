@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const {cloudinary} = require('./cloudinary');
 
 //models
 const User = require('./models/user');
@@ -115,7 +116,12 @@ app.get('/signup', (req, res) => {
 // gets the info from the sign up page, then creates a new user with that info, logs them in, and redirects to the homepage.
 app.post('/signup', catchAsync(async (req, res) => {
     try {
-        const { username, name, dob, email, password } = req.body;
+        const { username, name, dob, email, password, confirmPassword } = req.body;
+        if(password !== confirmPassword){
+            req.flash('error', 'Passwords must match!');
+            res.redirect('/signup')
+            return next();
+        }
         const user = new User({ username, name, dob, email, joinDate: new Date() });
         const registeredUser = await User.register(user, password);
         const followers = new Followers({ owner: registeredUser._id });
@@ -124,6 +130,7 @@ app.post('/signup', catchAsync(async (req, res) => {
         const savedFollowing = await following.save();
         user.followers = savedFollowers._id;
         user.following = savedFollowing._id;
+        user.profilePicture = null;
         await user.save();
 
         req.login(registeredUser, err => {
@@ -217,6 +224,7 @@ app.put('/profile/:id', isLoggedIn, catchAsync(async (req, res) => {
         return res.redirect('/');
     }
     const newInfo = { ...req.body.profile };
+    
     const profile = await User.findByIdAndUpdate(id, newInfo);
     req.flash('success', 'Successfully updated profile!');
     res.redirect(`/profile/${user._id}`);

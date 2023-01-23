@@ -57,8 +57,8 @@
 
         
         <!-- Button trigger modal -->
-        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><svg
-                        class="bi" width="1em" height="1em" style="fill: white;">
+        <button class="btn btn-light" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><svg
+                        class="bi" width="1em" height="1em" style="fill: black;">
                         <use xlink:href="#pen" />
                 </svg></button>
 
@@ -67,22 +67,21 @@
                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                         <div class="modal-content">
-                                <div class="modal-header">
-                                        <h1 class="modal-title fs-5 text-dark" id="staticBackdropLabel">Compose Tweet
+                                <div class="modal-header" style="background-color: rgb(51, 15, 10);">
+                                        <h1 class="modal-title fs-5 text-light" id="staticBackdropLabel">Compose Tweet
                                         </h1>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
+                                                aria-label="Close" style="background-color: white;"></button>
                                 </div>
                                 <form action="/posttweet" method="post">
-                                        <div class="modal-body">
+                                        <div class="modal-body" style="background-color: rgb(51, 15, 10);">
                                                 <textarea name="content" id="content" cols="40"
                                                         rows="5"></textarea>
                                         </div>
-                                        <div class="modal-footer">
+                                        <div class="modal-footer" style="background-color: rgb(51, 15, 10);">
                                                 <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">Post</button>
-
+                                                <button type="submit" class="btn btn-light">Post</button>
                                         </div>
                                 </form>
                         </div>

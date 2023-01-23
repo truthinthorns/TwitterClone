@@ -2,6 +2,14 @@ const mongoose = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
 const {Schema} = mongoose;
 
+const ImageSchema = new Schema({
+    url: String,
+    filename: String
+});
+ImageSchema.virtual('thumbnail').get(function(){
+    return this.url.replace('/upload','/upload/w_200');
+});
+
 const UserSchema = new Schema({
     name: {
         type: String,
@@ -23,6 +31,7 @@ const UserSchema = new Schema({
         type: Date,
         required: true
     },
+    profilePicture: ImageSchema,
     followers: {
         type: Schema.Types.ObjectId,
         ref: 'Follower',
