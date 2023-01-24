@@ -6,9 +6,15 @@ const ImageSchema = new Schema({
     url: String,
     filename: String
 });
-ImageSchema.virtual('thumbnail').get(function(){
-    return this.url.replace('/upload','/upload/w_200');
+ImageSchema.virtual('tweet').get(function(){
+    return this.url.replace('/upload','/upload/w_50,h_50,r_max');
 });
+ImageSchema.virtual('follow').get(function(){
+    return this.url.replace('/upload','/upload/w_200,h_250');
+});
+ImageSchema.virtual('profilePic').get(function(){
+    return this.url.replace('/upload','/upload/w_200,h_200,r_max');
+})
 
 const UserSchema = new Schema({
     name: {

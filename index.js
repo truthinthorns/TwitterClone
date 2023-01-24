@@ -1,3 +1,7 @@
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config();
+}
+
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -8,7 +12,12 @@ const flash = require('connect-flash');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+
+//cloudinary (pictures)
 const {cloudinary} = require('./cloudinary');
+const multer = require('multer');
+const {storage} = require('./cloudinary/index');
+const upload = multer({storage});
 
 //models
 const User = require('./models/user');
@@ -130,7 +139,7 @@ app.post('/signup', catchAsync(async (req, res) => {
         const savedFollowing = await following.save();
         user.followers = savedFollowers._id;
         user.following = savedFollowing._id;
-        user.profilePicture = null;
+        user.profilePicture = {url: 'https://res.cloudinary.com/dtwpr1ft0/image/upload/e_negate/v1674561677/TwitterClone/userDefault.png', filename: 'TwitterClone/userDefault'};
         await user.save();
 
         req.login(registeredUser, err => {
@@ -216,18 +225,25 @@ app.get('/profile/:id', isLoggedIn, catchAsync(async (req, res) => {
 // first makes sure you're logged in
 // then finds a user with the requested id. if found, updates it with the entered info and redirects to the profile page. if not, redirects to the home page.
 // user gets logged out if they change their username, so that needs to be solved. They can change everything else without having to log back in, though.
-app.put('/profile/:id', isLoggedIn, catchAsync(async (req, res) => {
+app.put('/profile/:id', isLoggedIn, upload.single('profilePicture'),catchAsync(async (req, res) => {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) {
         req.flash('error', "Can't find that profile!");
         return res.redirect('/');
     }
-    const newInfo = { ...req.body.profile };
     
+    if(req.file){
+        user.profilePicture = {url: req.file.path, filename: req.file.filename};
+        await user.save();
+    }
+    
+    const newInfo = { ...req.body.profile };
     const profile = await User.findByIdAndUpdate(id, newInfo);
-    req.flash('success', 'Successfully updated profile!');
-    res.redirect(`/profile/${user._id}`);
+    if(profile){
+        req.flash('success', 'Successfully updated profile!');
+        res.redirect(`/profile/${user._id}`);
+    }
 }))
 
 // first makes sure you're logged in and it's your profile.

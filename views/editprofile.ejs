@@ -6,7 +6,11 @@
                 <h2 class="card-title text-light">Edit Profile</h2>
             </div>
             <div class="card-body mx-auto">
-                <form action="/profile/<%=user._id%>?_method=PUT" method="post" class="validate-form" novalidate>
+                <form action="/profile/<%=user._id%>?_method=PUT" method="post" class="validate-form" enctype="multipart/form-data" novalidate>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Choose image for profile picture</label>
+                        <input class="form-control" type="file" id="profilePicture" name ='profilePicture'>
+                    </div>  
                     <div class="mb-2">
                         <label for="s_nameInput" class="form-label text-light">Full Name</label>
                         <input type="text" class="form-control" id="s_nameInput" name="profile[name]" value="<%= user.name%>" 
@@ -31,8 +35,8 @@
                     </div>
                     <div class="mb-2">
                         <label for="s_bioInput" class="form-label text-light">Bio</label>
-                        <input type="text" class="form-control" id="s_bioInput" name="profile[bio]" value="<%= user.bio%>"
-                            >
+                        <textarea class="form-control" name="profile[bio]" id="s_bioInput" cols="30" rows="5"><%= user.bio%></textarea>
+                        <!-- <input type="text" class="form-control" id="s_bioInput" name="profile[bio]" value="<%= user.bio%>"> -->
                     </div>
                     <div class="mb-2">
                         <label for="s_dobInput" class="form-label text-light">Date of Birth</label>

@@ -14,12 +14,15 @@
         </svg>
 
     
-    <% if(alltweets.length > 1) {%> 
+    <% if(alltweets.length > 0) {%> 
     <% for (let tweet of alltweets) {%>
         <div class="card mb-3 w-50 offset-3" style="background-color: rgb(51, 15, 10);">
             <div class="row">
                 <div class="col">
                     <div class="card-body">
+                        <% if(tweet.author.profilePicture) {%>
+                                <img src="<%=tweet.author.profilePicture.tweet%>" class="mb-2" alt="">
+                        <% } %>
                         <h4 class="card-title text-light" style="display:inline;"><b><%= tweet.author.name %></b></h4>
                         <h5 class="card-title text-light" style="display:inline;">
                             <a href="/profile/<%= tweet.author._id %>" style="color: rgb(200,200,200 );">@<%= tweet.author.username %></a>
@@ -57,7 +60,7 @@
 
         
         <!-- Button trigger modal -->
-        <button class="btn btn-light" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><svg
+        <button class="btn btn-light mb-4 sticky-bottom" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"><svg
                         class="bi" width="1em" height="1em" style="fill: black;">
                         <use xlink:href="#pen" />
                 </svg></button>
