@@ -8,3 +8,8 @@
     font-size: xx-large;
     font-weight: 700;
 }
+
+.tweet-column{
+    height: 650px;
+    overflow-y: auto;
+}

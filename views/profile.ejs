@@ -170,7 +170,7 @@
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col tweet-column">
             <% for (let tweet of tweets) {%>
                 <div class="card mb-2" style="background-color: rgb(51, 15, 10);">
                     <div class="card-body">
@@ -204,6 +204,7 @@
                                                 <use xlink:href="#heart-filled" />
                                             </svg>
                                             <% } %>
+                                            <%=  tweet.likesRef.likerCount %>
                                 </button>
                             </form>
                             <% } %>

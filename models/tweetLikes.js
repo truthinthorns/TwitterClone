@@ -9,7 +9,8 @@ const TweetLikesSchema = new Schema({
     likers: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    
 })
 
 module.exports = mongoose.model('TweetLikes', TweetLikesSchema);

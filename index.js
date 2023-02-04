@@ -183,8 +183,8 @@ app.get('/logout', isLoggedIn, (req, res) => {
 app.post('/posttweet', isLoggedIn, catchAsync(async (req, res) => {
     const { content } = req.body;
     const formattedTimestamp = moment(new Date()).utc().format("ddd, MMM Do YYYY, h:mm A");
-    const tweet = new Tweet({ author: req.user._id, content, timestamp: new Date(), formattedTimestamp, likes: 0 });
-    const likes = new Likes({ author: req.user._id });
+    const tweet = new Tweet({ author: req.user._id, content, timestamp: new Date(), formattedTimestamp});
+    const likes = new Likes({ author: req.user._id, likerCount: 0 });
     const likesRef = await likes.save();
     tweet.likesRef = likes._id;
     await tweet.save();
@@ -367,13 +367,17 @@ app.put('/liketweet/:tweetID/:likerID', isLoggedIn, isNOTTweetAuthor, catchAsync
     //if likerIndex is -1, then the user hasn't liked this tweet. (or they unliked it at some point)
     if (likerIndex === -1) {
         //add the liker to the likes likersList
-        likes.likers.push(user._id);
+        await likes.likers.push(user._id);
+        likes.likerCount+=1;
+        await likes.save()
     }
     else {
         //remove the liker to the likes likersList
         await likes.likers.splice(likerIndex, 1);
+        likes.likerCount-=1;
+        await likes.save()
     }
-    await likes.save()
+    
 
     if (redir === 'profile')
         res.redirect(`/profile/${tweet.author}`);

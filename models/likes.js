@@ -9,7 +9,11 @@ const LikesSchema = new Schema({
     likers: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    likerCount: {
+        type: Number,
+        required: true
+    }
 })
 
 module.exports = mongoose.model('Likes',LikesSchema);
